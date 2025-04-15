@@ -41,11 +41,11 @@ return [
     // Logging settings
     'log_file' => 'server_load_updates.log',  // Log file name
     'log_enabled' => true,                     // Whether to log update operations
-    
+
     // Admin panel API communication
-    'admin_panel_url' => 'https://api.shrakvpn.com',  // URL of the admin panel API
+    'admin_panel_url' => 'https://1upone.com/api',  // URL of the admin panel API
     'server_api_key' => 'YOUR_SERVER_API_KEY',        // API key for authenticating with the admin panel
-    
+
     // User configuration storage
     'user_config_dir' => __DIR__ . '/user_db',        // Directory to store user configurations
     'auth_log_file' => __DIR__ . '/auth_attempts.log', // Authentication log file
