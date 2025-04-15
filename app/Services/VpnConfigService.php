@@ -203,27 +203,31 @@ class VpnConfigService
             // Clear specific user-server config
             Cache::forget("vpn_config:{$user->id}:{$server->id}");
         } elseif ($user) {
-            // Pattern to match all configs for this user
-            $pattern = "vpn_config:{$user->id}:*";
-            $keys = Cache::get($pattern);
-            foreach ($keys as $key) {
-                Cache::forget($key);
+            // Laravel doesn't support wildcard pattern deletion directly
+            // We need to handle individual server configurations for this user
+            $servers = Server::all();
+            foreach ($servers as $srv) {
+                Cache::forget("vpn_config:{$user->id}:{$srv->id}");
             }
         } elseif ($server) {
-            // Pattern to match all configs for this server
-            $pattern = "vpn_config:*:{$server->id}";
-            $keys = Cache::get($pattern);
-            foreach ($keys as $key) {
-                Cache::forget($key);
+            // Clear all user configs for this server
+            $users = User::all();
+            foreach ($users as $usr) {
+                Cache::forget("vpn_config:{$usr->id}:{$server->id}");
             }
         } else {
-            // Clear all VPN configs if no user or server specified
-            $pattern = "vpn_config:*";
-            $keys = Cache::get($pattern);
-            foreach ($keys as $key) {
-                Cache::forget($key);
+            // Clear all VPN configs (for all users and servers)
+            $users = User::all();
+            $servers = Server::all();
+
+            foreach ($users as $usr) {
+                foreach ($servers as $srv) {
+                    Cache::forget("vpn_config:{$usr->id}:{$srv->id}");
+                }
             }
         }
+
+        Log::info("VPN configuration cache cleared successfully");
     }
 
     /**

@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Observers\ServerObserver;
 use App\Observers\UserObserver;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Vite;
+use Illuminate\Support\Facades\URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,5 +27,10 @@ class AppServiceProvider extends ServiceProvider
         // Register observers
         User::observe(UserObserver::class);
         Server::observe(ServerObserver::class);
+
+        // Force HTTPS in production
+        if (config('app.env') === 'production') {
+            URL::forceScheme('https');
+        }
     }
 }
