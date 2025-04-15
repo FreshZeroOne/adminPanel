@@ -1,0 +1,262 @@
+{
+  "Rollup HTML Asset": {
+    "file": "index.html",
+    "src": "Rollup HTML Asset"
+  },
+  "__commonjsHelpers-Cpj98o6Y.js": {
+    "file": "assets/_commonjsHelpers-Cpj98o6Y.js",
+    "name": "_commonjsHelpers"
+  },
+  "node_modules/remixicon/fonts/remixicon.eot": {
+    "file": "assets/remixicon-BVJ9S1ev.eot",
+    "src": "node_modules/remixicon/fonts/remixicon.eot"
+  },
+  "node_modules/remixicon/fonts/remixicon.svg": {
+    "file": "assets/remixicon-C2wQ2gtc.svg",
+    "src": "node_modules/remixicon/fonts/remixicon.svg"
+  },
+  "node_modules/remixicon/fonts/remixicon.ttf": {
+    "file": "assets/remixicon-CfJD46dY.ttf",
+    "src": "node_modules/remixicon/fonts/remixicon.ttf"
+  },
+  "node_modules/remixicon/fonts/remixicon.woff": {
+    "file": "assets/remixicon-BBpe-Xu7.woff",
+    "src": "node_modules/remixicon/fonts/remixicon.woff"
+  },
+  "node_modules/remixicon/fonts/remixicon.woff2": {
+    "file": "assets/remixicon-BVvFtaex.woff2",
+    "src": "node_modules/remixicon/fonts/remixicon.woff2"
+  },
+  "resources/assets/css/demo.css": {
+    "file": "assets/demo-DSBboXU7.css",
+    "src": "resources/assets/css/demo.css",
+    "isEntry": true
+  },
+  "resources/assets/js/config.js": {
+    "file": "assets/config-6a_Q2AHb.js",
+    "name": "config",
+    "src": "resources/assets/js/config.js",
+    "isEntry": true
+  },
+  "resources/assets/js/dashboards-analytics.js": {
+    "file": "assets/dashboards-analytics-Dh2MRsYT.js",
+    "name": "dashboards-analytics",
+    "src": "resources/assets/js/dashboards-analytics.js",
+    "isEntry": true
+  },
+  "resources/assets/js/extended-ui-perfect-scrollbar.js": {
+    "file": "assets/extended-ui-perfect-scrollbar-87gYG_r1.js",
+    "name": "extended-ui-perfect-scrollbar",
+    "src": "resources/assets/js/extended-ui-perfect-scrollbar.js",
+    "isEntry": true
+  },
+  "resources/assets/js/form-basic-inputs.js": {
+    "file": "assets/form-basic-inputs-CjS8llQr.js",
+    "name": "form-basic-inputs",
+    "src": "resources/assets/js/form-basic-inputs.js",
+    "isEntry": true
+  },
+  "resources/assets/js/main.js": {
+    "file": "assets/main-BVSs49wv.js",
+    "name": "main",
+    "src": "resources/assets/js/main.js",
+    "isEntry": true
+  },
+  "resources/assets/js/pages-account-settings-account.js": {
+    "file": "assets/pages-account-settings-account-CFTyzG2K.js",
+    "name": "pages-account-settings-account",
+    "src": "resources/assets/js/pages-account-settings-account.js",
+    "isEntry": true
+  },
+  "resources/assets/js/ui-modals.js": {
+    "file": "assets/ui-modals-CYNbp-iO.js",
+    "name": "ui-modals",
+    "src": "resources/assets/js/ui-modals.js",
+    "isEntry": true
+  },
+  "resources/assets/js/ui-popover.js": {
+    "file": "assets/ui-popover-CbvAU9Mu.js",
+    "name": "ui-popover",
+    "src": "resources/assets/js/ui-popover.js",
+    "isEntry": true
+  },
+  "resources/assets/js/ui-toasts.js": {
+    "file": "assets/ui-toasts-D37theoU.js",
+    "name": "ui-toasts",
+    "src": "resources/assets/js/ui-toasts.js",
+    "isEntry": true
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.eot": {
+    "file": "assets/remixicon-DUK49BtM.eot",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.eot"
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.scss": {
+    "file": "assets/remixicon-B7rN07vz.css",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.svg": {
+    "file": "assets/remixicon-ncU_JTfY.svg",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.svg"
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.ttf": {
+    "file": "assets/remixicon-D9ZyeRwQ.ttf",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.ttf"
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.woff": {
+    "file": "assets/remixicon-DfzPQSMi.woff",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.woff"
+  },
+  "resources/assets/vendor/fonts/remixicon/remixicon.woff2": {
+    "file": "assets/remixicon-BVOYbT3K.woff2",
+    "src": "resources/assets/vendor/fonts/remixicon/remixicon.woff2"
+  },
+  "resources/assets/vendor/js/bootstrap.js": {
+    "file": "assets/bootstrap-B-W6M1Y3.js",
+    "name": "bootstrap",
+    "src": "resources/assets/vendor/js/bootstrap.js",
+    "isEntry": true
+  },
+  "resources/assets/vendor/js/helpers.js": {
+    "file": "assets/helpers-aLo0_AWg.js",
+    "name": "helpers",
+    "src": "resources/assets/vendor/js/helpers.js",
+    "isEntry": true
+  },
+  "resources/assets/vendor/js/menu.js": {
+    "file": "assets/menu-Bldkajpn.js",
+    "name": "menu",
+    "src": "resources/assets/vendor/js/menu.js",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/apex-charts/apex-charts.scss": {
+    "file": "assets/apex-charts-RBQcATyf.css",
+    "src": "resources/assets/vendor/libs/apex-charts/apex-charts.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/apex-charts/apexcharts.js": {
+    "file": "assets/apexcharts-C2C4GUK1.js",
+    "name": "apexcharts",
+    "src": "resources/assets/vendor/libs/apex-charts/apexcharts.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/highlight/highlight-github.scss": {
+    "file": "assets/highlight-github-BfC0goYb.css",
+    "src": "resources/assets/vendor/libs/highlight/highlight-github.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/highlight/highlight.js": {
+    "file": "assets/highlight-D7rprYox.js",
+    "name": "highlight",
+    "src": "resources/assets/vendor/libs/highlight/highlight.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/highlight/highlight.scss": {
+    "file": "assets/highlight-kfZccHYO.css",
+    "src": "resources/assets/vendor/libs/highlight/highlight.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/jquery/jquery.js": {
+    "file": "assets/jquery-8QpT-S21.js",
+    "name": "jquery",
+    "src": "resources/assets/vendor/libs/jquery/jquery.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/masonry/masonry.js": {
+    "file": "assets/masonry-COmGTbMr.js",
+    "name": "masonry",
+    "src": "resources/assets/vendor/libs/masonry/masonry.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/node-waves/node-waves.js": {
+    "file": "assets/node-waves-2Qs2Pmsa.js",
+    "name": "node-waves",
+    "src": "resources/assets/vendor/libs/node-waves/node-waves.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/node-waves/node-waves.scss": {
+    "file": "assets/node-waves-CNx6tA5W.css",
+    "src": "resources/assets/vendor/libs/node-waves/node-waves.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js": {
+    "file": "assets/perfect-scrollbar-DPYX2UL_.js",
+    "name": "perfect-scrollbar",
+    "src": "resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.scss": {
+    "file": "assets/perfect-scrollbar-BDWhptyD.css",
+    "src": "resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/libs/popper/popper.js": {
+    "file": "assets/popper-DBXphNvS.js",
+    "name": "popper",
+    "src": "resources/assets/vendor/libs/popper/popper.js",
+    "isEntry": true,
+    "imports": [
+      "__commonjsHelpers-Cpj98o6Y.js"
+    ]
+  },
+  "resources/assets/vendor/scss/core.scss": {
+    "file": "assets/core-BPh9Z8lG.css",
+    "src": "resources/assets/vendor/scss/core.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/scss/pages/page-account-settings.scss": {
+    "file": "assets/page-account-settings-kp278u0m.css",
+    "src": "resources/assets/vendor/scss/pages/page-account-settings.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/scss/pages/page-auth.scss": {
+    "file": "assets/page-auth-5k8RzDLC.css",
+    "src": "resources/assets/vendor/scss/pages/page-auth.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/scss/pages/page-icons.scss": {
+    "file": "assets/page-icons-CfdmAJIE.css",
+    "src": "resources/assets/vendor/scss/pages/page-icons.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/scss/pages/page-misc.scss": {
+    "file": "assets/page-misc-B-42Gdn-.css",
+    "src": "resources/assets/vendor/scss/pages/page-misc.scss",
+    "isEntry": true
+  },
+  "resources/assets/vendor/scss/theme-default.scss": {
+    "file": "assets/theme-default-CdUeSwCH.css",
+    "src": "resources/assets/vendor/scss/theme-default.scss",
+    "isEntry": true
+  },
+  "resources/css/app.css": {
+    "file": "assets/app-l0sNRNKZ.js",
+    "name": "app",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-D2H03dmm.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  }
+}

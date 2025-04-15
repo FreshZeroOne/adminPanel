@@ -1,0 +1,33 @@
+[2025-04-14 14:55:23] Script started. Running from: C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts
+[2025-04-14 14:55:23] ERROR: Configuration file not found at C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts/config.php
+[2025-04-14 14:55:23] Could not find config.php anywhere. Creating default config.
+[2025-04-14 14:55:23] Created default config.php at C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts
+[2025-04-14 14:55:23] Loading config from: C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts/config.php
+[2025-04-14 14:55:23] Config loaded successfully
+[2025-04-14 14:55:23] Starting main execution
+[2025-04-14 14:55:23] Using server ID from config file: us-01
+[2025-04-14 14:55:23] Server ID: us-01
+[2025-04-14 14:55:24] Connection load component: 0 connections / 100 max = 0%
+[2025-04-14 14:55:27] Bandwidth load component: 17%
+[2025-04-14 14:55:29] System load component: 13%
+[2025-04-14 14:55:29] Final calculated load: 5% (weighted sum of 0%, 8.5%, 13%)
+[2025-04-14 14:55:29] Calculated load: 5%
+[2025-04-14 14:55:29] Attempting database connection to 85.215.238.89:3306 (DB: api_db)
+[2025-04-14 14:55:29] Database connection successful
+[2025-04-14 14:55:29] Successfully updated load for server us-01 to 5%
+[2025-04-14 14:55:29] Database update result: SUCCESS
+[2025-04-14 14:55:29] Script started. Running from: C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts
+[2025-04-14 14:55:29] Loading config from: C:\Users\renes\Desktop\ShrakVpn\adminPanel\public\scripts/config.php
+[2025-04-14 14:55:29] Config loaded successfully
+[2025-04-14 14:55:29] Starting main execution
+[2025-04-14 14:55:29] Using server ID from config file: us-01
+[2025-04-14 14:55:29] Server ID: us-01
+[2025-04-14 14:55:30] Connection load component: 0 connections / 100 max = 0%
+[2025-04-14 14:55:31] Bandwidth load component: 22%
+[2025-04-14 14:55:32] System load component: 3%
+[2025-04-14 14:55:32] Final calculated load: 4% (weighted sum of 0%, 11%, 3%)
+[2025-04-14 14:55:32] Calculated load: 4%
+[2025-04-14 14:55:32] Attempting database connection to 85.215.238.89:3306 (DB: api_db)
+[2025-04-14 14:55:32] Database connection successful
+[2025-04-14 14:55:32] Successfully updated load for server us-01 to 4%
+[2025-04-14 14:55:32] Database update result: SUCCESS
