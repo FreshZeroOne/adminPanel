@@ -56,41 +56,115 @@ function send_response($success, $message, $statusCode = 200, $data = []) {
 function verify_api_request() {
     global $config;
 
-    // Get authorization header
-    $headers = getallheaders();
-    $authorization = $headers['Authorization'] ?? '';
-
-    // Check for Bearer token
-    if (preg_match('/Bearer\s+(.*)$/i', $authorization, $matches)) {
-        $token = $matches[1];
-        if ($token === $config['server_api_key']) {
-            return true;
+    // Get all headers - handle different server configurations
+    if (function_exists('getallheaders')) {
+        $headers = getallheaders();
+    } else {
+        // Manual header collection for servers without getallheaders()
+        $headers = [];
+        foreach ($_SERVER as $name => $value) {
+            if (substr($name, 0, 5) === 'HTTP_') {
+                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))));
+                $headers[$name] = $value;
+            } elseif ($name === 'CONTENT_TYPE' || $name === 'CONTENT_LENGTH') {
+                $name = str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', $name))));
+                $headers[$name] = $value;
+            }
         }
     }
 
-    // Alternative: Check X-Server-API-Key header
-    $apiKey = $headers['X-Server-API-Key'] ?? '';
-    if ($apiKey === $config['server_api_key']) {
-        return true;
+    // Debug headers
+    $headerStr = json_encode($headers);
+    api_log("Request headers: $headerStr", "DEBUG");
+    api_log("Expected API key: " . $config['server_api_key'], "DEBUG");
+
+    // Check for Bearer token - case insensitive
+    $authorization = '';
+    foreach ($headers as $key => $value) {
+        if (strtolower($key) === 'authorization') {
+            $authorization = $value;
+            break;
+        }
     }
 
-    api_log("Unauthorized API request attempt", "WARNING");
+    if (!empty($authorization)) {
+        api_log("Found Authorization header: $authorization", "DEBUG");
+        if (preg_match('/Bearer\s+(.*)$/i', $authorization, $matches)) {
+            $token = $matches[1];
+            if ($token === $config['server_api_key']) {
+                return true;
+            } else {
+                api_log("Bearer token does not match API key", "DEBUG");
+            }
+        }
+    }
+
+    // Alternative: Check X-Server-API-Key or X-API-Key header
+    $apiKey = '';
+    foreach ($headers as $key => $value) {
+        if (strtolower($key) === 'x-server-api-key' || strtolower($key) === 'x-api-key') {
+            $apiKey = $value;
+            break;
+        }
+    }
+
+    if (!empty($apiKey)) {
+        api_log("Found API key header: $apiKey", "DEBUG");
+        if ($apiKey === $config['server_api_key']) {
+            return true;
+        } else {
+            api_log("X-API-Key does not match server_api_key", "DEBUG");
+        }
+    }
+
+    api_log("No valid authorization found in request", "WARNING");
     return false;
+}
+
+// Helper function to determine the current endpoint from URL
+function get_current_endpoint() {
+    // Try PATH_INFO first (common in many setups)
+    if (isset($_SERVER['PATH_INFO']) && !empty($_SERVER['PATH_INFO'])) {
+        return $_SERVER['PATH_INFO'];
+    }
+
+    // Try REQUEST_URI and parse out query string and script name
+    if (isset($_SERVER['REQUEST_URI'])) {
+        $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $scriptName = basename($_SERVER['SCRIPT_NAME']);
+
+        // Remove script name from URI if it's at the end
+        if (substr($uri, -strlen($scriptName)) === $scriptName) {
+            $uri = substr($uri, 0, -strlen($scriptName));
+        }
+
+        // If we're accessing root, return /ping as default for easy testing
+        if ($uri === '/' || empty($uri)) {
+            return '/ping';
+        }
+
+        return $uri;
+    }
+
+    // Default to /ping for root requests
+    return '/ping';
 }
 
 // Main API request handler
 try {
     // Log the request
     $method = $_SERVER['REQUEST_METHOD'];
-    $endpoint = $_SERVER['PATH_INFO'] ?? '/';
+    $endpoint = get_current_endpoint();
     $clientIP = $_SERVER['REMOTE_ADDR'];
 
     api_log("Received $method request to $endpoint from $clientIP");
 
     // Verify all API requests except for specific public endpoints
-    $publicEndpoints = ['/ping'];
+    // Change: Remove ping from public endpoints so it requires authentication
+    $publicEndpoints = ['/public_ping.php'];
 
     if (!in_array($endpoint, $publicEndpoints) && !verify_api_request()) {
+        api_log("Unauthorized API request attempt", "WARNING");
         send_response(false, 'Unauthorized', 401);
     }
 

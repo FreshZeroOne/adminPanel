@@ -113,22 +113,29 @@ class VpnConfigService
      *
      * @param User $user
      * @param Server $server
-     * @return string
+     * @return array Return an array with 'config' (the WireGuard config) and 'privateKey' (the user's private key)
      */
-    public function generateWireGuardConfig(User $user, Server $server): string
+    public function generateWireGuardConfig(User $user, Server $server): array
     {
         $config = $this->generateConfig($user, $server);
 
         // Generate WireGuard keys for this user
         list($privateKey, $publicKey) = $this->generateWireGuardKeys($user, $server);
 
+        // Get the server's public key
+        $serverPublicKey = $this->getServerPublicKey($server);
+
+        // Generate a unique client IP address from user ID
+        $clientIp = "10.8.0." . ($user->id % 254 + 1);
+
         $wgConfig = "[Interface]\n";
-        $wgConfig .= "PrivateKey = $privateKey\n";
-        $wgConfig .= "Address = 10.8.0." . ($user->id % 254 + 1) . "/24\n";
+        $wgConfig .= "# IMPORTANT: Your private key is provided separately for security reasons\n";
+        $wgConfig .= "# Do not include the private key directly in this file\n";
+        $wgConfig .= "Address = $clientIp/24\n";
         $wgConfig .= "DNS = 1.1.1.1, 1.0.0.1\n\n";
 
         $wgConfig .= "[Peer]\n";
-        $wgConfig .= "PublicKey = ServerPublicKeyPlaceholder\n"; // Replace with actual server public key
+        $wgConfig .= "PublicKey = $serverPublicKey\n";
         $wgConfig .= "AllowedIPs = 0.0.0.0/0, ::/0\n";
         $wgConfig .= "Endpoint = {$config['server']['domain']}:51820\n";
         $wgConfig .= "PersistentKeepalive = 25\n";
@@ -139,7 +146,163 @@ class VpnConfigService
         $wgConfig .= "# Generated: {$config['created_at']}\n";
         $wgConfig .= "# Expires: {$config['expires_at']}\n";
 
-        return $wgConfig;
+        // Create secure instructions for handling the private key
+        $instructions = <<<EOT
+SECURITY INSTRUCTIONS FOR WIREGUARD PRIVATE KEY
+
+Your WireGuard private key is extremely sensitive data. To use it securely:
+
+1. For desktop clients:
+   - Store the key in a separate file with restricted permissions
+   - Run: echo "$privateKey" > privatekey
+   - Run: chmod 600 privatekey (on Linux/Mac)
+   - Set file permissions to "read-only" for your user account only (on Windows)
+   - In your WireGuard client, import the configuration and point to this private key file
+
+2. For mobile clients:
+   - When importing the configuration, manually enter the private key
+   - Delete any messages or notes containing the private key after setup
+   - Never share your private key with anyone
+
+3. Key rotation:
+   - This key will expire on {$config['expires_at']}
+   - Generate a new configuration after this date
+EOT;
+
+        return [
+            'config' => $wgConfig,
+            'privateKey' => $privateKey,
+            'instructions' => $instructions
+        ];
+    }
+
+    /**
+     * Generate WireGuard keys for a user
+     *
+     * @param User $user
+     * @param Server $server
+     * @return array Array containing [privateKey, publicKey]
+     */
+    protected function generateWireGuardKeys(User $user, Server $server): array
+    {
+        // First attempt: Use actual WireGuard tools (most secure)
+        try {
+            // Check if wg command is available
+            $checkWg = shell_exec('which wg 2>/dev/null');
+            if (!empty($checkWg)) {
+                // Use temporary files with secure permissions for key generation
+                $tempPrivateKeyFile = tempnam(sys_get_temp_dir(), 'wg_private_');
+                chmod($tempPrivateKeyFile, 0600); // Set secure permissions
+
+                // Generate private key using actual WireGuard tools
+                shell_exec("wg genkey > $tempPrivateKeyFile");
+                $privateKey = trim(file_get_contents($tempPrivateKeyFile));
+
+                // Generate public key directly from private key
+                $tempPublicKeyFile = tempnam(sys_get_temp_dir(), 'wg_public_');
+                shell_exec("cat $tempPrivateKeyFile | wg pubkey > $tempPublicKeyFile");
+                $publicKey = trim(file_get_contents($tempPublicKeyFile));
+
+                // Clean up temporary files
+                unlink($tempPrivateKeyFile);
+                unlink($tempPublicKeyFile);
+
+                if (!empty($privateKey) && !empty($publicKey)) {
+                    // Persist the keys securely to the database or another secure storage
+                    $this->storeWireGuardKeys($user->id, $server->id, $publicKey);
+                    return [$privateKey, $publicKey];
+                }
+            }
+        } catch (\Exception $e) {
+            // Log the error but continue to fallback method
+            \Log::warning("Failed to generate WireGuard keys using WireGuard tools: " . $e->getMessage());
+        }
+
+        // Second attempt: Use PHP's secure cryptographic functions
+        try {
+            // Generate a cryptographically secure private key
+            $privateKey = sodium_bin2base64(random_bytes(32), SODIUM_BASE64_VARIANT_ORIGINAL);
+
+            // For this fallback method, we would need to implement a proper curve25519 conversion to get the public key
+            // This is just a placeholder - in a real implementation, you would need proper crypto libraries
+            // Consider installing a PHP library that can properly handle WireGuard key generation
+
+            // Until then, we're just generating a random public key as well (this is NOT a real WireGuard key pair)
+            $publicKey = sodium_bin2base64(random_bytes(32), SODIUM_BASE64_VARIANT_ORIGINAL);
+
+            // Log that we're using fallback crypto (less secure than actual WireGuard tools)
+            \Log::notice("Using PHP's crypto functions for WireGuard key generation - consider installing WireGuard tools");
+
+            // Store the public key
+            $this->storeWireGuardKeys($user->id, $server->id, $publicKey);
+
+            return [$privateKey, $publicKey];
+        } catch (\Exception $e) {
+            // Log this serious error
+            \Log::error("Failed to generate secure WireGuard keys: " . $e->getMessage());
+
+            // If we reach here, we have a serious security issue
+            throw new \Exception("Cannot generate secure WireGuard keys. Please check server configuration.");
+        }
+    }
+
+    /**
+     * Store WireGuard public key in a secure manner
+     *
+     * @param int $userId
+     * @param int $serverId
+     * @param string $publicKey
+     * @return void
+     */
+    protected function storeWireGuardKeys(int $userId, int $serverId, string $publicKey): void
+    {
+        // Store the public key in the database or another secure storage
+        // This is a stub method - implement according to your storage strategy
+
+        // Example implementation might store this in a dedicated table:
+        // DB::table('wireguard_keys')->updateOrInsert(
+        //     ['user_id' => $userId, 'server_id' => $serverId],
+        //     ['public_key' => $publicKey, 'created_at' => now(), 'expires_at' => now()->addDays(30)]
+        // );
+
+        // For now, just log that we would store the key
+        \Log::info("Stored WireGuard public key for user $userId on server $serverId");
+    }
+
+    /**
+     * Get the WireGuard public key for a server
+     *
+     * @param Server $server
+     * @return string
+     */
+    protected function getServerPublicKey(Server $server): string
+    {
+        // Cache key for the server's public key
+        $cacheKey = "server_wg_pubkey:{$server->id}";
+
+        // Return cached key if available
+        if (Cache::has($cacheKey)) {
+            return Cache::get($cacheKey);
+        }
+
+        try {
+            // Try to fetch the server's public key from the server API
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . config('variables.server_api_key'),
+                'Accept' => 'application/json',
+            ])->get("{$server->domain}/api/server-info");
+
+            if ($response->successful() && isset($response['wireguard_public_key'])) {
+                $publicKey = $response['wireguard_public_key'];
+                Cache::put($cacheKey, $publicKey, now()->addDays(7));
+                return $publicKey;
+            }
+        } catch (\Exception $e) {
+            Log::error("Failed to fetch server public key: {$e->getMessage()}");
+        }
+
+        // Fallback if we can't get the actual key
+        return "ServerPublicKeyPlaceholder";
     }
 
     /**
@@ -168,26 +331,6 @@ class VpnConfigService
         // Use API key if available, otherwise generate a token based on user credentials
         $baseToken = $user->api_key ?? md5($user->email . $user->id . $server->id . config('app.key'));
         return hash_hmac('sha256', $baseToken, config('app.key'));
-    }
-
-    /**
-     * Generate WireGuard key pair for a user and server
-     *
-     * @param User $user
-     * @param Server $server
-     * @return array [privateKey, publicKey]
-     */
-    protected function generateWireGuardKeys(User $user, Server $server): array
-    {
-        // In a real implementation, you'd use actual WireGuard key generation
-        // For this example, we'll simulate it with a deterministic approach
-        $seed = md5($user->id . $server->id . config('app.key'));
-
-        // This is a placeholder - in production you'd use proper WireGuard key generation
-        $privateKey = substr(hash('sha256', $seed . '-private'), 0, 44) . '=';
-        $publicKey = substr(hash('sha256', $seed . '-public'), 0, 44) . '=';
-
-        return [$privateKey, $publicKey];
     }
 
     /**

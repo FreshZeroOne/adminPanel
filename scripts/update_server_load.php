@@ -27,97 +27,67 @@ function debug_log($message) {
 // Log script start
 debug_log("Script started. Running from: " . __DIR__);
 
-// Load configuration
-$configFile = __DIR__ . '/config.php';
-if (!file_exists($configFile)) {
-    debug_log("ERROR: Configuration file not found at $configFile");
-    // Try to find config file in same directory as the script
-    if (file_exists('./config.php')) {
-        $configFile = './config.php';
-        debug_log("Found config at ./config.php");
-    } elseif (file_exists('/root/config.php')) {
-        $configFile = '/root/config.php';
-        debug_log("Found config at /root/config.php");
-    } else {
-        debug_log("Could not find config.php anywhere. Creating default config.");
-        // Create a default config
-        $defaultConfig = <<<'EOD'
-<?php
-
-/**
- * Configuration for the VPN Server
- *
- * Edit this file to match your environment settings.
- */
-
-return [
-    // Server identification
-    'server_id' => 'us-01', // Set this to your server ID (e.g., 'de-01')
-
-    // VPN type: 'openvpn' or 'wireguard'
-    'vpn_type' => 'wireguard',
-
-    // Database connection details (for server load updates)
-    'db_host'     => '85.215.238.89',      // Database host
-    'db_name'     => 'api_db',       // Database name
-    'db_user'     => 'api_user',        // Database username
-    'db_password' => 'weilisso001',       // Database password (use environment variables in production)
-    'db_port'     => 3306,             // Database port
-
-    // VPN server settings
-    'interfaces'  => ['wg0', 'eth0'], // Network interfaces to monitor for bandwidth
-    'max_connections' => 100,          // Maximum number of connections the server is configured to handle
-
-    // Load calculation weights
-    'weights' => [
-        'connection' => 0.5,  // Weight for connection count in load calculation
-        'bandwidth'  => 0.3,  // Weight for bandwidth usage in load calculation
-        'system'     => 0.2,  // Weight for system (CPU/memory) in load calculation
-    ],
-
-    // OpenVPN specific settings (only used if vpn_type is 'openvpn')
-    'openvpn_management_host' => 'localhost',
-    'openvpn_management_port' => 7505,
-
-    // Wireguard specific settings (only used if vpn_type is 'wireguard')
-    'wireguard_interface' => 'wg0',  // The main Wireguard interface
-
-    // Logging settings
-    'log_file' => 'server_load_updates.log',  // Log file name
-    'log_enabled' => true,                     // Whether to log update operations
-
-    // Admin panel API communication
-    'admin_panel_url' => 'https://api.shrakvpn.com',  // URL of the admin panel API
-    'server_api_key' => 'YOUR_SERVER_API_KEY',        // API key for authenticating with the admin panel
-
-    // User configuration storage
-    'user_config_dir' => __DIR__ . '/user_db',        // Directory to store user configurations
-    'auth_log_file' => __DIR__ . '/auth_attempts.log', // Authentication log file
+// Load configuration - look in multiple places to ensure we find it
+$possibleConfigPaths = [
+    __DIR__ . '/config.php',               // Current directory
+    '/var/www/shrakvpn/api/config.php',    // Standard API directory
+    '/var/www/shrakvpn/config.php',        // Main app directory
+    dirname(__DIR__) . '/api/config.php',  // Relative API directory
+    dirname(__DIR__) . '/config.php',      // Parent directory
 ];
-EOD;
-        file_put_contents(__DIR__ . '/config.php', $defaultConfig);
-        $configFile = __DIR__ . '/config.php';
-        debug_log("Created default config.php at " . __DIR__);
+
+$configFile = null;
+foreach ($possibleConfigPaths as $path) {
+    if (file_exists($path)) {
+        $configFile = $path;
+        debug_log("Found config at: $configFile");
+        break;
     }
+}
+
+if (!$configFile) {
+    debug_log("ERROR: Configuration file not found in any of the standard paths");
+    echo "ERROR: Configuration file not found!\n";
+    echo "Please run the generate_server_config.php script first to create a configuration file.\n";
+    exit(1);
 }
 
 try {
     debug_log("Loading config from: $configFile");
     $config = require $configFile;
     debug_log("Config loaded successfully");
+
+    // Verify that required config values exist
+    $requiredKeys = ['server_id', 'db_host', 'db_name', 'db_user', 'db_password', 'db_port'];
+    $missingKeys = [];
+
+    foreach ($requiredKeys as $key) {
+        if (!isset($config[$key]) || empty($config[$key])) {
+            $missingKeys[] = $key;
+        }
+    }
+
+    if (!empty($missingKeys)) {
+        debug_log("ERROR: Missing required configuration values: " . implode(', ', $missingKeys));
+        echo "ERROR: Missing required configuration values: " . implode(', ', $missingKeys) . "\n";
+        echo "Please run the generate_server_config.php script to create a complete configuration.\n";
+        exit(1);
+    }
+
 } catch (Exception $e) {
     debug_log("ERROR loading config: " . $e->getMessage());
     die("Error loading config: " . $e->getMessage() . "\n");
 }
 
 // Make sure the log directory exists and is writable
-$logDir = dirname(__DIR__ . '/' . ($config['log_file'] ?? 'server_load_updates.log'));
+$logFile = $config['log_file'] ?? '/var/www/shrakvpn/logs/server_load_updates.log';
+$logDir = dirname($logFile);
 if (!is_dir($logDir)) {
     debug_log("Creating log directory: $logDir");
     mkdir($logDir, 0777, true);
 }
 
-// Function to get the current server ID
+// Function to get the current server ID - prioritize config file over other methods
 function getServerId($config, $argv) {
     // If server_id was provided as a command line argument
     if (isset($argv[1])) {
@@ -125,7 +95,7 @@ function getServerId($config, $argv) {
         return $argv[1];
     }
 
-    // Use the server_id from the config file
+    // Use the server_id from the config file - this is the preferred method
     if (isset($config['server_id']) && !empty($config['server_id'])) {
         debug_log("Using server ID from config file: " . $config['server_id']);
         return $config['server_id'];
@@ -409,11 +379,13 @@ function updateServerLoadInDb($config, $serverId, $load) {
         $checkStmt = $pdo->prepare("SELECT id FROM servers WHERE id = :id");
         $checkStmt->execute(['id' => $serverId]);
         if (!$checkStmt->fetch()) {
-            debug_log("WARNING: Server ID '$serverId' not found in database.");
+            debug_log("WARNING: Server ID '$serverId' not found in database. Make sure it's registered in the admin panel.");
+            echo "WARNING: Server ID '$serverId' not found in database.\n";
+            echo "Make sure this server is registered in the admin panel with exactly this ID: $serverId\n";
         }
 
         // Update server load - using backticks to escape the reserved keyword 'load'
-        $stmt = $pdo->prepare("UPDATE servers SET `load` = :load WHERE id = :id");
+        $stmt = $pdo->prepare("UPDATE servers SET `load` = :load, updated_at = NOW() WHERE id = :id");
         $stmt->execute(['load' => $load, 'id' => $serverId]);
 
         $rowCount = $stmt->rowCount();
